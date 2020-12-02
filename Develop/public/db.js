@@ -1,11 +1,9 @@
 console.log('hit db.js');
 let db;
-const request = indexedDB.open("budget", 2);
+const request = indexedDB.open("budget", 1);
 
 request.onupgradeneeded = (event) => {
-    const db = event.target.result;
-    db.createObjectStore("pending", { autoIncrement: true });
-};
+@@ -11,7 +12,7 @@ request.onupgradeneeded = (event) => {
 
 request.onsuccess = (event) => {
     db = event.target.result;
@@ -14,25 +12,18 @@ request.onsuccess = (event) => {
         checkDatabase();
     }
 };
-
 request.onerror = (event) => {
     console("Error connecting to database: ", event.target.errorCode);
 }
-
 function saveRecord(record) {
     const transaction = db.transaction(["pending"], "readwrite");
-
     const store = transaction.objectStore("pending");
-
     store.add(record);
 }
-
 function checkDatabase() {
     const transaction = db.transaction(["pending"], "readwrite");
     const store = transaction.objectStore("pending");
-
     const getAll = store.getAll();
-
     getAll.onsuccess = () => {
         if (getAll.result.length > 0) {
             fetch("/api/transaction/bulk", {
@@ -50,5 +41,4 @@ function checkDatabase() {
         }
     };
 }
-
 window.addEventListener("online", checkDatabase);
